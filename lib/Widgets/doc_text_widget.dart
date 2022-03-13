@@ -32,6 +32,12 @@ class DocTextWidget extends StatelessWidget {
                       childCount: doc.lines.length,
                     ),
                   ),
+                  SliverList(
+                      delegate: SliverChildListDelegate([
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ])),
                 ],
               ),
             ),
@@ -62,17 +68,14 @@ class PageText extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-      child: AnimatedDefaultTextStyle(
-        duration: const Duration(milliseconds: 100),
+      child: Text(
+        text,
         style: TextStyle(
           height: 1.1,
           fontFamily: FONT_NAME,
           fontSize: isSelected ? 22 : 20,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected ? Colors.white : Colors.grey[400],
-        ),
-        child: Text(
-          text,
         ),
       ),
     );
@@ -86,10 +89,17 @@ class Controls extends StatelessWidget {
   Widget build(BuildContext context) {
     TtsState ttsState = Provider.of<TtsProvider>(context).ttsState;
     return Container(
-      color: Theme.of(context).colorScheme.secondary,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondary,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
@@ -119,8 +129,7 @@ class Controls extends StatelessWidget {
               IconButton(
                 icon: Icon(
                   ttsState == TtsState.playing ? Icons.pause : Icons.play_arrow,
-                  color: Colors.white,
-                  size: 28,
+                  size: 32,
                 ),
                 onPressed:
                     Provider.of<TtsProvider>(context, listen: false).playPause,
@@ -133,7 +142,31 @@ class Controls extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                iconSize: 18,
+                onPressed: Provider.of<TtsProvider>(context).decreaseRate,
+                icon: const Icon(
+                  Icons.remove,
+                ),
+              ),
+              Text(
+                Provider.of<TtsProvider>(context).rate.toStringAsFixed(1),
+                style: const TextStyle(
+                  color: Color(ACCENT_COLOR),
+                ),
+              ),
+              IconButton(
+                iconSize: 18,
+                onPressed: Provider.of<TtsProvider>(context).increaseRate,
+                icon: const Icon(
+                  Icons.add,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

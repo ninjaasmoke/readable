@@ -65,16 +65,28 @@ class TtsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void increaseRate() {
+  Future<void> increaseRate() async {
     _rate += 0.1;
-    tts.setSpeechRate(_rate);
-    notifyListeners();
+    if (ttsState == TtsState.playing) {
+      await stop();
+      tts.setSpeechRate(_rate);
+      await playPause();
+    } else {
+      tts.setSpeechRate(_rate);
+      notifyListeners();
+    }
   }
 
-  void decreaseRate() {
+  Future<void> decreaseRate() async {
     _rate -= 0.1;
-    tts.setSpeechRate(_rate);
-    notifyListeners();
+    if (ttsState == TtsState.playing) {
+      await stop();
+      tts.setSpeechRate(_rate);
+      await playPause();
+    } else {
+      tts.setSpeechRate(_rate);
+      notifyListeners();
+    }
   }
 
   Future<void> _speak(String text) async {
