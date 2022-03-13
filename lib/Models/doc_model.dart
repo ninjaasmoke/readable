@@ -9,7 +9,8 @@ class Doc {
       lines[++i] = m.group(0)!;
     }
     for (var lineEntry in lines.entries) {
-      lines[lineEntry.key] = lineEntry.value.replaceAll('\n', ' ').trim();
+      lines[lineEntry.key] =
+          lineEntry.value.replaceAll('\n', ' ').replaceAll(" +", " ").trim();
     }
   }
 

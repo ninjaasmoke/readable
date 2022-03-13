@@ -22,37 +22,31 @@ class DocTextWidget extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.close),
                 iconSize: 18,
-                onPressed:
-                    Provider.of<PdfProvider>(context, listen: false).closePdf,
+                onPressed: () {
+                  Provider.of<PdfProvider>(context, listen: false).closePdf();
+                  Provider.of<TtsProvider>(context, listen: false).reset();
+                },
               ),
             ],
           ),
           body: Scrollbar(
-            // child: SingleChildScrollView(
-            //   child: Column(
-            //     children: doc.lines.entries.map((line) {
-            //       return PageText(
-            //         text: line.value,
-            //         id: line.key,
-            //         isSelected: line.key ==
-            //             Provider.of<TtsProvider>(context).playingLine,
-            //       );
-            //     }).toList(),
-            //   ),
-            // ),
             child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverList(
-                    delegate: SliverChildListDelegate(
-                  doc.lines.entries.map((line) {
-                    return PageText(
-                      text: line.value,
-                      id: line.key,
-                      isSelected: line.key ==
-                          Provider.of<TtsProvider>(context).playingLine,
-                    );
-                  }).toList(),
-                )),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final entry = doc.lines;
+                      return PageText(
+                        text: entry[index + 1]!,
+                        id: index + 1,
+                        isSelected: (index + 1) ==
+                            Provider.of<TtsProvider>(context).playingLine,
+                      );
+                    },
+                    childCount: doc.lines.length,
+                  ),
+                ),
               ],
             ),
           ),
@@ -60,7 +54,7 @@ class DocTextWidget extends StatelessWidget {
         ),
         onWillPop: () {
           Provider.of<PdfProvider>(context, listen: false).closePdf();
-          Provider.of<TtsProvider>(context, listen: false).stop();
+          Provider.of<TtsProvider>(context, listen: false).reset();
           return Future.value(false);
         });
   }
@@ -80,15 +74,19 @@ class PageText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: Key('$id'),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
-      child: Text(
-        text,
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      child: AnimatedDefaultTextStyle(
+        duration: const Duration(milliseconds: 100),
         style: TextStyle(
           height: 1.1,
-          fontSize: isSelected ? 28 : 18,
-          color: isSelected ? const Color(ACCENT_COLOR) : Colors.white,
+          fontFamily: FONT_NAME,
+          fontSize: isSelected ? 22 : 20,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? Colors.white : Colors.grey[300],
+        ),
+        child: Text(
+          text,
         ),
       ),
     );

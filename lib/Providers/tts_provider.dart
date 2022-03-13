@@ -17,6 +17,7 @@ class TtsProvider extends ChangeNotifier {
   TtsProvider() {
     tts.setLanguage("en-US");
     tts.setVolume(_volume);
+    tts.setVoice({"name": "en-gb-x-gbd-local", "locale": "en-GB"});
     tts.setPitch(_pitch);
     tts.setSpeechRate(_rate);
 
@@ -29,6 +30,11 @@ class TtsProvider extends ChangeNotifier {
       ttsState = TtsState.stopped;
       notifyListeners();
     });
+    work();
+  }
+
+  Future<void> work() async {
+    print("Engines: ${await tts.getVoices}");
   }
 
   double get volume => _volume;
@@ -89,17 +95,22 @@ class TtsProvider extends ChangeNotifier {
         await _speak(lines.entries.toList()[i].value);
         playingLine = i + 2;
       }
-      await stop();
+      await reset();
     }
-    notifyListeners();
   }
 
   Future<void> stop() async {
     final res = await tts.stop();
     if (res == 1) {
-      playingLine = 1;
       ttsState = TtsState.stopped;
       notifyListeners();
     }
+  }
+
+  Future<void> reset() async {
+    await stop();
+    playingLine = 1;
+    ttsState = TtsState.stopped;
+    notifyListeners();
   }
 }
