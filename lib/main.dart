@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:readable/Providers/pdf_provider.dart';
 import 'package:readable/Providers/tts_provider.dart';
 import 'package:readable/Widgets/wrapper.dart';
 import 'package:readable/theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final directory = await getApplicationDocumentsDirectory();
+  await Hive.initFlutter(directory.path);
+  await Hive.openBox('voice');
   runApp(const MyApp());
 }
 

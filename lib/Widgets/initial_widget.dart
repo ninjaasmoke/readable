@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:readable/Pages/settings_page.dart';
 import 'package:readable/Providers/pdf_provider.dart';
 import 'package:readable/constants.dart';
 
@@ -44,24 +46,44 @@ class InitialWidget extends StatelessWidget {
           ),
         ),
         const InstructionSteps(),
-        Center(
-          child: TextButton(
-            style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
-                backgroundColor: const Color(ACCENT_COLOR),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                )),
-            onPressed: Provider.of<PdfProvider>(context, listen: false).pickPdf,
-            child: const Text(
-              "Pick PDF",
-              style: TextStyle(
-                  color: Color(DEFAULT_TEXT_COLOR),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.info_outline),
+              iconSize: 20,
             ),
-          ),
+            TextButton(
+              style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
+                  backgroundColor: const Color(ACCENT_COLOR),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                  )),
+              onPressed:
+                  Provider.of<PdfProvider>(context, listen: false).pickPdf,
+              child: const Text(
+                "Pick PDF",
+                style: TextStyle(
+                    color: Color(DEFAULT_TEXT_COLOR),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            IconButton(
+              onPressed: () => Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  fullscreenDialog: false,
+                  builder: (context) => const SettingsPage(),
+                ),
+              ),
+              icon: const Icon(Icons.settings),
+              iconSize: 20,
+            ),
+          ],
         ),
       ],
     );

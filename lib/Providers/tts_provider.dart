@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:hive/hive.dart';
+import 'package:readable/Models/voice_model.dart';
 
 enum TtsState { playing, stopped }
 
@@ -7,6 +11,16 @@ class TtsProvider extends ChangeNotifier {
   FlutterTts tts = FlutterTts();
   Map<int, String> lines = Map.from({});
   TtsState ttsState = TtsState.stopped;
+
+  final List<Voice> _availableVoices = <Voice>[];
+  List<Voice> get availableVoices => _availableVoices;
+
+  final box = Hive.box('voice');
+
+  Voice currentVoice = Voice(
+    name: 'es-us-x-sfb-local',
+    locale: 'en-US',
+  );
 
   int playingLine = 1;
 
@@ -17,7 +31,6 @@ class TtsProvider extends ChangeNotifier {
   TtsProvider() {
     tts.setLanguage("en-US");
     tts.setVolume(_volume);
-    tts.setVoice({"name": "en-gb-x-gbd-local", "locale": "en-GB"});
     tts.setPitch(_pitch);
     tts.setSpeechRate(_rate);
 
@@ -30,11 +43,38 @@ class TtsProvider extends ChangeNotifier {
       ttsState = TtsState.stopped;
       notifyListeners();
     });
-    work();
+
+    setInitVoice();
+
+    loadVoices();
   }
 
-  Future<void> work() async {
-    print("Engines: ${await tts.getVoices}");
+  void setInitVoice() async {
+    final name = box.get('name');
+    final locale = box.get('locale');
+    final Voice voice = Voice(
+      name: name ?? 'es-us-x-sfb-local',
+      locale: locale ?? 'en-US',
+    );
+    setVoice(voice);
+  }
+
+  void setVoice(Voice voice) {
+    box.putAll({
+      'name': voice.name,
+      'locale': voice.locale,
+    });
+    currentVoice = voice;
+    tts.setVoice(currentVoice.toJson());
+    notifyListeners();
+  }
+
+  Future<void> loadVoices() async {
+    final voices = await tts.getVoices;
+    for (final voice in voices) {
+      _availableVoices.add(Voice.fromJson(json.decode(jsonEncode(voice))));
+    }
+    notifyListeners();
   }
 
   double get volume => _volume;
@@ -93,16 +133,13 @@ class TtsProvider extends ChangeNotifier {
     await tts.awaitSpeakCompletion(true);
     await tts.awaitSynthCompletion(true);
     final res = await tts.speak(text);
-    if (res == 1) {
-      ttsState = TtsState.playing;
-      notifyListeners();
-    }
   }
 
   Future<void> playPause() async {
     if (ttsState == TtsState.playing) {
       await stop();
     } else {
+      ttsState = TtsState.playing;
       for (int i = playingLine - 1; i < lines.length; i++) {
         await _speak(lines.entries.toList()[i].value);
         playingLine = i + 2;
