@@ -13,41 +13,27 @@ class DocTextWidget extends StatelessWidget {
     final doc_model.Doc doc = Provider.of<PdfProvider>(context).doc;
     return WillPopScope(
         child: Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'Readable',
-              style: TextStyle(color: Color(ACCENT_COLOR), fontSize: 16),
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.close),
-                iconSize: 18,
-                onPressed: () {
-                  Provider.of<PdfProvider>(context, listen: false).closePdf();
-                  Provider.of<TtsProvider>(context, listen: false).reset();
-                },
-              ),
-            ],
-          ),
-          body: Scrollbar(
-            child: CustomScrollView(
-              physics: const BouncingScrollPhysics(),
-              slivers: [
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final entry = doc.lines;
-                      return PageText(
-                        text: entry[index + 1]!,
-                        id: index + 1,
-                        isSelected: (index + 1) ==
-                            Provider.of<TtsProvider>(context).playingLine,
-                      );
-                    },
-                    childCount: doc.lines.length,
+          body: SafeArea(
+            child: Scrollbar(
+              child: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final entry = doc.lines;
+                        return PageText(
+                          text: entry[index + 1]!,
+                          id: index + 1,
+                          isSelected: (index + 1) ==
+                              Provider.of<TtsProvider>(context).playingLine,
+                        );
+                      },
+                      childCount: doc.lines.length,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           bottomNavigationBar: const Controls(),
@@ -83,7 +69,7 @@ class PageText extends StatelessWidget {
           fontFamily: FONT_NAME,
           fontSize: isSelected ? 22 : 20,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? Colors.white : Colors.grey[300],
+          color: isSelected ? Colors.white : Colors.grey[400],
         ),
         child: Text(
           text,
@@ -93,38 +79,8 @@ class PageText extends StatelessWidget {
   }
 }
 
-class Controls extends StatefulWidget {
+class Controls extends StatelessWidget {
   const Controls({Key? key}) : super(key: key);
-
-  @override
-  State<Controls> createState() => _ControlsState();
-}
-
-class _ControlsState extends State<Controls>
-    with SingleTickerProviderStateMixin {
-  late AnimationController progressAnimation;
-  @override
-  void initState() {
-    progressAnimation = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    );
-    super.initState();
-  }
-
-  void _handleOnPressed(ttsState) {
-    setState(() {
-      ttsState == TtsState.stopped
-          ? progressAnimation.forward()
-          : progressAnimation.reverse();
-    });
-  }
-
-  @override
-  void dispose() {
-    progressAnimation.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,18 +89,52 @@ class _ControlsState extends State<Controls>
       color: Theme.of(context).colorScheme.secondary,
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
-      padding: const EdgeInsets.all(20),
-      child: IconButton(
-        icon: AnimatedIcon(
-          icon: AnimatedIcons.play_pause,
-          progress: progressAnimation,
-          color: Colors.white,
-          size: 20,
-        ),
-        onPressed: () {
-          Provider.of<TtsProvider>(context, listen: false).playPause();
-          _handleOnPressed(ttsState);
-        },
+      child: Column(
+        children: [
+          Row(
+            children: [
+              TextButton(
+                child: const Text(
+                  "Close",
+                  style: TextStyle(
+                    color: Color(ACCENT_COLOR),
+                  ),
+                ),
+                onPressed: () {
+                  Provider.of<PdfProvider>(context, listen: false).closePdf();
+                  Provider.of<TtsProvider>(context, listen: false).reset();
+                },
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                onPressed:
+                    Provider.of<TtsProvider>(context, listen: false).rewind,
+                iconSize: 20,
+                icon: const Icon(Icons.fast_rewind),
+              ),
+              IconButton(
+                icon: Icon(
+                  ttsState == TtsState.playing ? Icons.pause : Icons.play_arrow,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                onPressed:
+                    Provider.of<TtsProvider>(context, listen: false).playPause,
+              ),
+              IconButton(
+                onPressed: Provider.of<TtsProvider>(context, listen: false)
+                    .fastForward,
+                iconSize: 20,
+                icon: const Icon(Icons.fast_forward),
+              ),
+            ],
+          ),
+          const SizedBox(),
+        ],
       ),
     );
   }

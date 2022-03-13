@@ -113,4 +113,20 @@ class TtsProvider extends ChangeNotifier {
     ttsState = TtsState.stopped;
     notifyListeners();
   }
+
+  Future<void> fastForward() async {
+    if (playingLine < lines.length) {
+      await stop();
+      playingLine++;
+      await playPause();
+    }
+  }
+
+  Future<void> rewind() async {
+    if (playingLine > 1) {
+      await stop();
+      playingLine--;
+      await playPause();
+    }
+  }
 }
