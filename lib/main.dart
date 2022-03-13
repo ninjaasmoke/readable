@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:readable/Providers/pdf_provider.dart';
-import 'package:readable/Widgets/initial_widget.dart';
-import 'package:readable/Widgets/loader.dart';
+import 'package:readable/Providers/tts_provider.dart';
 import 'package:readable/Widgets/wrapper.dart';
 import 'package:readable/theme.dart';
 
@@ -18,7 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => PdfProvider()),
+        ChangeNotifierProvider<PdfProvider>(create: (context) => PdfProvider()),
+        ChangeNotifierProxyProvider<PdfProvider, TtsProvider>(
+          create: (context) => TtsProvider(),
+          update: (context, pdfProvider, ttsProvider) =>
+              ttsProvider!..lines = pdfProvider.doc.lines,
+        ),
       ],
       builder: (context, child) {
         return MaterialApp(

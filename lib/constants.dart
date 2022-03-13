@@ -2,4 +2,4 @@
 
 const FONT_NAME = "Product";
 const ACCENT_COLOR = 0xffe50914;
-const DEFAULT_TEXT_COLOR = 0xffd0d0d0;
+const DEFAULT_TEXT_COLOR = 0xffffffff;

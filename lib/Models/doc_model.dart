@@ -1,33 +1,14 @@
-import 'package:pdf_text/pdf_text.dart';
-
-class Page {
-  Map<int, String>? lines;
-  late int pageNum;
-
-  Page({required this.pageNum, this.lines});
-}
-
 class Doc {
-  List<Page> pages = [];
+  Map<int, String> lines = {};
 
-  Future<void> addPages(List<PDFPage> pdfPages) async {
-    for (var pdfPage in pdfPages) {
-      final text = await pdfPage.text;
-      final linesList = text
-          .replaceAll(RegExp(r'\n'), ' ')
-          .replaceAll(RegExp(r'•'), '\n')
-          .split('. ')
-          .map((e) => e.trim().replaceAll(RegExp(r'\.'), '. '))
-          .toList();
-      final page = Page(
-        pageNum: pdfPage.number,
-        lines: linesList.asMap(),
-      );
-      pages.add(page);
+  addLines(String paragrapgh) {
+    RegExp regExp = RegExp(r"([^.!?]+[.!?])");
+    Iterable<Match> matches = regExp.allMatches(paragrapgh);
+    int i = 0;
+    for (Match m in matches) {
+      lines[++i] = m.group(0)!.trim();
     }
   }
 
-  void clear() {
-    pages.clear();
-  }
+  void clear() => lines = {};
 }

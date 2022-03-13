@@ -8,7 +8,7 @@ ThemeData darkTheme = ThemeData(
   colorScheme: const ColorScheme(
     background: Colors.black,
     primary: Colors.white,
-    secondary: Color(0xff141418),
+    secondary: Color(0xff141818),
     surface: Colors.black,
     error: Color(ACCENT_COLOR),
     onBackground: Colors.white,
@@ -19,6 +19,6 @@ ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
   ),
   appBarTheme: const AppBarTheme(
-    backgroundColor: Color(0xff141418),
+    backgroundColor: Color(0xff141818),
   ),
 );

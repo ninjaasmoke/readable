@@ -13,6 +13,11 @@ class InitialWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
+        const SizedBox(),
+        SizedBox(
+          height: 160,
+          child: SvgPicture.asset('assets/Images/toy.svg'),
+        ),
         Padding(
           padding: const EdgeInsets.all(20.0),
           child: RichText(
@@ -38,23 +43,22 @@ class InitialWidget extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(
-          height: 160,
-          child: SvgPicture.asset('assets/Images/toy.svg'),
-        ),
         const InstructionSteps(),
         Center(
           child: TextButton(
             style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              backgroundColor: const Color(ACCENT_COLOR),
-            ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 40),
+                backgroundColor: const Color(ACCENT_COLOR),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                )),
             onPressed: Provider.of<PdfProvider>(context, listen: false).pickPdf,
             child: const Text(
               "Pick PDF",
               style: TextStyle(
                   color: Color(DEFAULT_TEXT_COLOR),
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold),
             ),
           ),

@@ -38,8 +38,7 @@ class PdfProvider extends ChangeNotifier {
         file = File(result.files.single.path!);
         pdfDoc = await PDFDoc.fromFile(file!);
         docText = await pdfDoc!.text;
-        pages = pdfDoc!.pages;
-        doc.addPages(pages!);
+        doc.addLines(docText!);
         setBusy(false);
       } else {
         _setError('You did not pick a PDF! Please try again.');
@@ -48,8 +47,9 @@ class PdfProvider extends ChangeNotifier {
     } catch (e) {
       _setError("Unable to load PDF!");
       setBusy(false);
+    } finally {
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void closePdf() {
