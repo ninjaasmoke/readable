@@ -74,7 +74,6 @@ class TtsProvider extends ChangeNotifier {
   Future<void> _speak(String text) async {
     await tts.awaitSpeakCompletion(true);
     await tts.awaitSynthCompletion(true);
-    await tts.setVoice({"name": "Karen", "locale": "en-AU"});
     final res = await tts.speak(text);
     if (res == 1) {
       ttsState = TtsState.playing;
@@ -86,7 +85,11 @@ class TtsProvider extends ChangeNotifier {
     if (ttsState == TtsState.playing) {
       await stop();
     } else {
-      await _speak(lines[playingLine++] ?? "");
+      for (int i = playingLine - 1; i < lines.length; i++) {
+        await _speak(lines.entries.toList()[i].value);
+        playingLine = i + 2;
+      }
+      await stop();
     }
     notifyListeners();
   }
@@ -94,6 +97,7 @@ class TtsProvider extends ChangeNotifier {
   Future<void> stop() async {
     final res = await tts.stop();
     if (res == 1) {
+      playingLine = 1;
       ttsState = TtsState.stopped;
       notifyListeners();
     }

@@ -28,23 +28,39 @@ class DocTextWidget extends StatelessWidget {
             ],
           ),
           body: Scrollbar(
-            child: SingleChildScrollView(
-              child: Column(
-                children: doc.lines.entries.map((line) {
-                  return PageText(
-                    text: line.value,
-                    id: line.key,
-                    isSelected: line.key ==
-                        Provider.of<TtsProvider>(context).playingLine,
-                  );
-                }).toList(),
-              ),
+            // child: SingleChildScrollView(
+            //   child: Column(
+            //     children: doc.lines.entries.map((line) {
+            //       return PageText(
+            //         text: line.value,
+            //         id: line.key,
+            //         isSelected: line.key ==
+            //             Provider.of<TtsProvider>(context).playingLine,
+            //       );
+            //     }).toList(),
+            //   ),
+            // ),
+            child: CustomScrollView(
+              slivers: [
+                SliverList(
+                    delegate: SliverChildListDelegate(
+                  doc.lines.entries.map((line) {
+                    return PageText(
+                      text: line.value,
+                      id: line.key,
+                      isSelected: line.key ==
+                          Provider.of<TtsProvider>(context).playingLine,
+                    );
+                  }).toList(),
+                )),
+              ],
             ),
           ),
           bottomNavigationBar: const Controls(),
         ),
         onWillPop: () {
           Provider.of<PdfProvider>(context, listen: false).closePdf();
+          Provider.of<TtsProvider>(context, listen: false).stop();
           return Future.value(false);
         });
   }
@@ -100,7 +116,7 @@ class _ControlsState extends State<Controls>
 
   void _handleOnPressed(ttsState) {
     setState(() {
-      ttsState == TtsState.playing
+      ttsState == TtsState.stopped
           ? progressAnimation.forward()
           : progressAnimation.reverse();
     });
@@ -127,7 +143,10 @@ class _ControlsState extends State<Controls>
           color: Colors.white,
           size: 20,
         ),
-        onPressed: () => _handleOnPressed(ttsState),
+        onPressed: () {
+          Provider.of<TtsProvider>(context, listen: false).playPause();
+          _handleOnPressed(ttsState);
+        },
       ),
     );
   }
