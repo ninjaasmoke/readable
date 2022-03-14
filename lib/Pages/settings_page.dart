@@ -22,7 +22,7 @@ class SettingsPage extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.all(20.0),
-                child: Text('Voice'),
+                child: Text('Choose Voice'),
               ),
               DropdownButton<String>(
                 value: currentVoice.name,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:readable/Pages/info_page.dart';
 import 'package:readable/Pages/settings_page.dart';
 import 'package:readable/Providers/pdf_provider.dart';
 import 'package:readable/constants.dart';
@@ -50,7 +51,13 @@ class InitialWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: () {},
+              onPressed: () => Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  fullscreenDialog: false,
+                  builder: (context) => const InfoPage(),
+                ),
+              ),
               icon: const Icon(Icons.info_outline),
               iconSize: 20,
             ),

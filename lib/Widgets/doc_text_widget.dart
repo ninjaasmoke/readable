@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:readable/Providers/pdf_provider.dart';
@@ -70,6 +71,7 @@ class PageText extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Text(
         text,
+        softWrap: true,
         style: TextStyle(
           height: 1.1,
           fontFamily: FONT_NAME,
@@ -82,12 +84,34 @@ class PageText extends StatelessWidget {
   }
 }
 
-class Controls extends StatelessWidget {
+class Controls extends StatefulWidget {
   const Controls({Key? key}) : super(key: key);
 
   @override
+  State<Controls> createState() => _ControlsState();
+}
+
+class _ControlsState extends State<Controls>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    TtsState ttsState = Provider.of<TtsProvider>(context).ttsState;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.secondary,
@@ -126,13 +150,25 @@ class Controls extends StatelessWidget {
                 iconSize: 20,
                 icon: const Icon(Icons.fast_rewind),
               ),
-              IconButton(
-                icon: Icon(
-                  ttsState == TtsState.playing ? Icons.pause : Icons.play_arrow,
-                  size: 32,
-                ),
-                onPressed:
-                    Provider.of<TtsProvider>(context, listen: false).playPause,
+              ValueListenableBuilder(
+                valueListenable:
+                    ValueNotifier(Provider.of<TtsProvider>(context).ttsState),
+                builder: (context, value, child) {
+                  if (value == TtsState.playing) {
+                    _controller.forward();
+                  } else {
+                    _controller.reverse();
+                  }
+                  return IconButton(
+                    icon: AnimatedIcon(
+                      icon: AnimatedIcons.play_pause,
+                      progress: _controller,
+                      size: 32,
+                    ),
+                    onPressed: Provider.of<TtsProvider>(context, listen: false)
+                        .playPause,
+                  );
+                },
               ),
               IconButton(
                 onPressed: Provider.of<TtsProvider>(context, listen: false)
