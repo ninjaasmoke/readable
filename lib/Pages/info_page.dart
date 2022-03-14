@@ -15,7 +15,7 @@ class InfoPage extends StatelessWidget {
             child: Text(
               'Something will come here, maybe...',
               style: TextStyle(
-                fontSize: 48,
+                fontSize: 18,
               ),
             ),
           ),
@@ -27,8 +27,14 @@ class InfoPage extends StatelessWidget {
             onPressed: Navigator.of(context).pop,
             label: const Text(
               "Back",
+              style: TextStyle(
+                fontSize: 16,
+              ),
             ),
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(
+              Icons.arrow_back,
+              size: 16,
+            ),
           ),
         ],
       ),
